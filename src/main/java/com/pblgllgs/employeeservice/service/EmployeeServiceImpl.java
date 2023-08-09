@@ -38,7 +38,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 //        ResponseEntity<DepartmentDto> responseEntity =
 //                restTemplate
 //                        .getForEntity(
-//                                "http://localhost:8080/api/v1/department/"+employeeDb.getDepartmentCode(),
+//                                "http://DEPARTMENT-SERVICE/api/v1/department/"+employeeDb.getDepartmentCode(),
 //                                DepartmentDto.class
 //                        );
 
