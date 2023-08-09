@@ -1,9 +1,10 @@
 package com.pblgllgs.employeeservice.service;
 
 import com.pblgllgs.employeeservice.dto.EmployeeDto;
+import com.pblgllgs.employeeservice.entity.ApiResponseDto;
 
 public interface EmployeeService {
     EmployeeDto createEmployee(EmployeeDto employeeDto);
 
-    EmployeeDto findEmployeeById(Long employeeId);
+    ApiResponseDto findEmployeeById(Long employeeId);
 }

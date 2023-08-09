@@ -1,7 +1,9 @@
 package com.pblgllgs.employeeservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pblgllgs.employeeservice.client.DepartmentClient;
 import com.pblgllgs.employeeservice.dto.EmployeeDto;
+import com.pblgllgs.employeeservice.entity.ApiResponseDto;
 import com.pblgllgs.employeeservice.entity.Employee;
 import com.pblgllgs.employeeservice.exception.ResourceNotFoundException;
 import com.pblgllgs.employeeservice.repository.EmployeeRepository;
@@ -10,8 +12,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
-public class EmployeeServiceImpl implements EmployeeService{
+public class EmployeeServiceImpl implements EmployeeService {
     private final EmployeeRepository employeeRepository;
+    //    private final RestTemplate restTemplate;
+//    private final WebClient webClient;
+    private final DepartmentClient departmentClient;
+
 
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
@@ -22,12 +28,30 @@ public class EmployeeServiceImpl implements EmployeeService{
     }
 
     @Override
-    public EmployeeDto findEmployeeById(Long employeeId) {
+    public ApiResponseDto findEmployeeById(Long employeeId) {
         ObjectMapper objectMapper = new ObjectMapper();
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow( () -> new ResourceNotFoundException("Employee","id",employeeId));
-        return objectMapper.convertValue(employeeDb,EmployeeDto.class);
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+//        RestTemplate
+//        ResponseEntity<DepartmentDto> responseEntity =
+//                restTemplate
+//                        .getForEntity(
+//                                "http://localhost:8080/api/v1/department/"+employeeDb.getDepartmentCode(),
+//                                DepartmentDto.class
+//                        );
+
+//        WebClient
+//        DepartmentDto departmentDto = webClient.get()
+//                .uri("http://localhost:8080/api/v1/department/" + employeeDb.getDepartmentCode())
+//                .retrieve()
+//                .bodyToMono(DepartmentDto.class)
+//                .block();
+
+        return new ApiResponseDto(
+                objectMapper.convertValue(employeeDb, EmployeeDto.class),
+                departmentClient.findDepartmentById(employeeDb.getDepartmentCode()).getBody()
+        );
     }
 }

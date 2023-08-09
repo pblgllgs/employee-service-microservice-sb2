@@ -41,4 +41,10 @@ public class Employee {
             name = "email"
     )
     private String email;
+
+    @Column(
+            nullable = false,
+            name = "department_code"
+    )
+    private String departmentCode;
 }
