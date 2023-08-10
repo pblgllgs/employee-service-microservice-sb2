@@ -40,7 +40,7 @@ public class EmployeeServiceImplWebClient implements EmployeeService {
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
 
         DepartmentDto departmentDto = webClient.get()
                 .uri("http://localhost:8080/api/v1/department/" + employeeDb.getDepartmentCode())
@@ -60,7 +60,7 @@ public class EmployeeServiceImplWebClient implements EmployeeService {
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         DepartmentDto departmentDto = new DepartmentDto();
         departmentDto.setId(2L);
         departmentDto.setDepartmentName("DEV");

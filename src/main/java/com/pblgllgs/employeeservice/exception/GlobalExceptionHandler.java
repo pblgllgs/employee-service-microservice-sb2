@@ -1,30 +1,43 @@
 package com.pblgllgs.employeeservice.exception;
 
-import com.pblgllgs.employeeservice.entity.ErrorDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import java.util.Date;
+import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLIntegrityConstraintViolationException;
+import java.time.LocalDateTime;
 
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
-    public ResponseEntity<ErrorDetails> handleResourceNotFoundException(
-            ResourceNotFoundException resourceNotFoundException,
-            WebRequest webRequest
+    public ResponseEntity<ErrorDetails> handleException(
+            ResourceNotFoundException e,
+            HttpServletRequest request
     ) {
-        return new ResponseEntity<>(
-                new ErrorDetails(
-                        new Date(),
-                        resourceNotFoundException.getMessage(),
-                        webRequest.getDescription(false)
-                ),
-                HttpStatus.NOT_FOUND
+        ErrorDetails errorDetails = new ErrorDetails(
+                request.getRequestURI(),
+                e.getMessage(),
+                HttpStatus.NOT_FOUND.value(),
+                LocalDateTime.now()
         );
+        return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ErrorDetails> handleException(
+            SQLIntegrityConstraintViolationException e,
+            HttpServletRequest request
+    ) {
+        ErrorDetails errorDetails = new ErrorDetails(
+                request.getRequestURI(),
+                e.getMessage(),
+                HttpStatus.CONFLICT.value(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
     }
 }

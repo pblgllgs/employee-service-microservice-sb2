@@ -8,18 +8,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLIntegrityConstraintViolationException;
+
 @RestController
 @RequestMapping("/api/v1/employee")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
 
-    public EmployeeController(@Qualifier("feign")EmployeeService employeeService) {
+    public EmployeeController(@Qualifier("feign") EmployeeService employeeService) {
         this.employeeService = employeeService;
     }
 
     @PostMapping
-    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) {
+    public ResponseEntity<EmployeeDto> createEmployee(@RequestBody EmployeeDto employeeDto) throws SQLIntegrityConstraintViolationException {
         return new ResponseEntity<>(employeeService.createEmployee(employeeDto), HttpStatus.CREATED);
     }
 

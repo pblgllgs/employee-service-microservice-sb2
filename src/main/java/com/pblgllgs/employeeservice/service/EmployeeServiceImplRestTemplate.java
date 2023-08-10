@@ -42,7 +42,7 @@ public class EmployeeServiceImplRestTemplate implements EmployeeService {
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         ResponseEntity<DepartmentDto> responseEntity =
                 restTemplate
                         .getForEntity(
@@ -62,7 +62,7 @@ public class EmployeeServiceImplRestTemplate implements EmployeeService {
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         DepartmentDto departmentDto = new DepartmentDto();
         departmentDto.setId(2L);
         departmentDto.setDepartmentName("DEV");

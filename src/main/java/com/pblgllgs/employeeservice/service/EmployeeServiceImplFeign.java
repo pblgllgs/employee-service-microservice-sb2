@@ -19,10 +19,9 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 @Qualifier("feign")
 public class EmployeeServiceImplFeign implements EmployeeService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImplFeign.class);
     private final EmployeeRepository employeeRepository;
     private final DepartmentClient departmentClient;
-    private static  final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImplFeign.class);
-
 
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
@@ -34,14 +33,14 @@ public class EmployeeServiceImplFeign implements EmployeeService {
 
     @Override
 //    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
-    @Retry( name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
     public ApiResponseDto findEmployeeById(Long employeeId) {
         LOGGER.info("inside getEmployeeById method FEIGN");
         ObjectMapper objectMapper = new ObjectMapper();
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
                 departmentClient.findDepartmentById(employeeDb.getDepartmentCode()).getBody()
@@ -54,7 +53,7 @@ public class EmployeeServiceImplFeign implements EmployeeService {
         Employee employeeDb =
                 employeeRepository
                         .findById(employeeId)
-                        .orElseThrow(() -> new ResourceNotFoundException("Employee", "id", employeeId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         DepartmentDto departmentDto = new DepartmentDto();
         departmentDto.setId(2L);
         departmentDto.setDepartmentName("DEV");
