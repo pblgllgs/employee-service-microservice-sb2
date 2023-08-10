@@ -3,6 +3,7 @@ package com.pblgllgs.employeeservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pblgllgs.employeeservice.dto.DepartmentDto;
 import com.pblgllgs.employeeservice.dto.EmployeeDto;
+import com.pblgllgs.employeeservice.dto.OrganizationDto;
 import com.pblgllgs.employeeservice.entity.ApiResponseDto;
 import com.pblgllgs.employeeservice.entity.Employee;
 import com.pblgllgs.employeeservice.exception.ResourceNotFoundException;
@@ -43,16 +44,24 @@ public class EmployeeServiceImplRestTemplate implements EmployeeService {
                 employeeRepository
                         .findById(employeeId)
                         .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
-        ResponseEntity<DepartmentDto> responseEntity =
+        ResponseEntity<DepartmentDto> responseEntityDepartment =
                 restTemplate
                         .getForEntity(
                                 "http://DEPARTMENT-SERVICE/api/v1/department/"+employeeDb.getDepartmentCode(),
                                 DepartmentDto.class
                         );
 
+        ResponseEntity<OrganizationDto> responseEntityOrganization =
+                restTemplate
+                        .getForEntity(
+                                "http://ORGANIZATION-SERVICE/api/v1/department/"+employeeDb.getOrganizationCode(),
+                                OrganizationDto.class
+                        );
+
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
-                responseEntity.getBody()
+                responseEntityDepartment.getBody(),
+                responseEntityOrganization.getBody()
         );
     }
 
@@ -69,9 +78,16 @@ public class EmployeeServiceImplRestTemplate implements EmployeeService {
         departmentDto.setDepartmentCode("002-DEV");
         departmentDto.setDepartmentDescription("DEV");
 
+        OrganizationDto organizationDto =  new OrganizationDto();
+        departmentDto.setId(1L);
+        departmentDto.setDepartmentName("DEV");
+        departmentDto.setDepartmentCode("001-DEV");
+        departmentDto.setDepartmentDescription("DEV");
+
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
-                departmentDto
+                departmentDto,
+                organizationDto
         );
     }
 }

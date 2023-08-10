@@ -2,8 +2,10 @@ package com.pblgllgs.employeeservice.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pblgllgs.employeeservice.client.DepartmentClient;
+import com.pblgllgs.employeeservice.client.OrganizationClient;
 import com.pblgllgs.employeeservice.dto.DepartmentDto;
 import com.pblgllgs.employeeservice.dto.EmployeeDto;
+import com.pblgllgs.employeeservice.dto.OrganizationDto;
 import com.pblgllgs.employeeservice.entity.ApiResponseDto;
 import com.pblgllgs.employeeservice.entity.Employee;
 import com.pblgllgs.employeeservice.exception.ResourceNotFoundException;
@@ -22,6 +24,7 @@ public class EmployeeServiceImplFeign implements EmployeeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(EmployeeServiceImplFeign.class);
     private final EmployeeRepository employeeRepository;
     private final DepartmentClient departmentClient;
+    private final OrganizationClient organizationClient;
 
     @Override
     public EmployeeDto createEmployee(EmployeeDto employeeDto) {
@@ -33,7 +36,7 @@ public class EmployeeServiceImplFeign implements EmployeeService {
 
     @Override
 //    @CircuitBreaker(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
-    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultDepartment")
+    @Retry(name = "${spring.application.name}", fallbackMethod = "getDefaultData")
     public ApiResponseDto findEmployeeById(Long employeeId) {
         LOGGER.info("inside getEmployeeById method FEIGN");
         ObjectMapper objectMapper = new ObjectMapper();
@@ -43,11 +46,12 @@ public class EmployeeServiceImplFeign implements EmployeeService {
                         .orElseThrow(() -> new ResourceNotFoundException("Employee not found"));
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
-                departmentClient.findDepartmentById(employeeDb.getDepartmentCode()).getBody()
+                departmentClient.findDepartmentById(employeeDb.getDepartmentCode()).getBody(),
+                organizationClient.findOrganizationById(employeeDb.getOrganizationCode()).getBody()
         );
     }
 
-    public ApiResponseDto getDefaultDepartment(Long employeeId, Exception ex) {
+    public ApiResponseDto getDefaultData(Long employeeId, Exception ex) {
         LOGGER.info("inside getDefaultDepartment method");
         ObjectMapper objectMapper = new ObjectMapper();
         Employee employeeDb =
@@ -60,9 +64,17 @@ public class EmployeeServiceImplFeign implements EmployeeService {
         departmentDto.setDepartmentCode("002-DEV");
         departmentDto.setDepartmentDescription("DEV");
 
+        OrganizationDto organizationDto =  new OrganizationDto();
+        departmentDto.setId(1L);
+        departmentDto.setDepartmentName("DEV");
+        departmentDto.setDepartmentCode("001-DEV");
+        departmentDto.setDepartmentDescription("DEV");
+
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
-                departmentDto
+                departmentDto,
+                organizationDto
+
         );
     }
 }

@@ -47,4 +47,9 @@ public class Employee {
             name = "department_code"
     )
     private String departmentCode;
+    @Column(
+            nullable = false,
+            name = "organization_code"
+    )
+    private String organizationCode;
 }

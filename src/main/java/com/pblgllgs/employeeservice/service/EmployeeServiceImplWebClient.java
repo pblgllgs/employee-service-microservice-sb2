@@ -3,6 +3,7 @@ package com.pblgllgs.employeeservice.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pblgllgs.employeeservice.dto.DepartmentDto;
 import com.pblgllgs.employeeservice.dto.EmployeeDto;
+import com.pblgllgs.employeeservice.dto.OrganizationDto;
 import com.pblgllgs.employeeservice.entity.ApiResponseDto;
 import com.pblgllgs.employeeservice.entity.Employee;
 import com.pblgllgs.employeeservice.exception.ResourceNotFoundException;
@@ -48,9 +49,16 @@ public class EmployeeServiceImplWebClient implements EmployeeService {
                 .bodyToMono(DepartmentDto.class)
                 .block();
 
+        OrganizationDto organizationDto = webClient.get()
+                .uri("http://localhost:8082/api/v1/organization/" + employeeDb.getOrganizationCode())
+                .retrieve()
+                .bodyToMono(OrganizationDto.class)
+                .block();
+
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
-                departmentDto
+                departmentDto,
+                organizationDto
         );
     }
 
@@ -67,9 +75,16 @@ public class EmployeeServiceImplWebClient implements EmployeeService {
         departmentDto.setDepartmentCode("002-DEV");
         departmentDto.setDepartmentDescription("DEV");
 
+        OrganizationDto organizationDto =  new OrganizationDto();
+        departmentDto.setId(1L);
+        departmentDto.setDepartmentName("DEV");
+        departmentDto.setDepartmentCode("001-DEV");
+        departmentDto.setDepartmentDescription("DEV");
+
         return new ApiResponseDto(
                 objectMapper.convertValue(employeeDb, EmployeeDto.class),
-                departmentDto
+                departmentDto,
+                organizationDto
         );
     }
 }
